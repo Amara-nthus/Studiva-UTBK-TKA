@@ -304,3 +304,32 @@ export const updateProfile = createServerFn({ method: "POST" })
 
     return { ok: true };
   });
+
+export const createGuestUser = createServerFn({ method: "POST" })
+  .handler(async () => {
+    const SUPABASE_URL = process.env.SUPABASE_URL;
+    const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+      throw new Error("Missing Supabase configuration. Silakan buat file .env dari .env.example terlebih dahulu.");
+    }
+
+    // Generate a unique dummy email
+    const email = `guest_${Math.floor(100000 + Math.random() * 900000)}@studiva.com`;
+    const password = "password123";
+
+    const { data, error } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { display_name: "Guest Pelajar" },
+    });
+
+    if (error) {
+      console.error("Error creating guest user:", error);
+      throw new Error(error.message || "Gagal membuat akun guest");
+    }
+
+    return { email, password };
+  });
+
