@@ -67,23 +67,46 @@ async function callDirectGemini(
     : undefined;
 
   // Map messages to Gemini API format (role must be "user" or "model")
-  const contents = opts.messages
-    .filter((m) => m.role !== "system")
-    .map((m) => {
-      const role = m.role === "assistant" ? "model" : "user";
-      let textContent = "";
-      if (typeof m.content === "string") {
-        textContent = m.content;
-      } else if (Array.isArray(m.content)) {
-        textContent = m.content
-          .map((part) => (part.type === "text" ? part.text : ""))
-          .join("\n");
-      }
-      return {
-        role,
-        parts: [{ text: textContent }],
-      };
-    });
+  const contents = await Promise.all(
+    opts.messages
+      .filter((m) => m.role !== "system")
+      .map(async (m) => {
+        const role = m.role === "assistant" ? "model" : "user";
+        const parts: any[] = [];
+        if (typeof m.content === "string") {
+          parts.push({ text: m.content });
+        } else if (Array.isArray(m.content)) {
+          for (const part of m.content) {
+            if (part.type === "text") {
+              parts.push({ text: part.text });
+            } else if (part.type === "image_url") {
+              try {
+                const response = await fetch(part.image_url.url);
+                if (!response.ok) {
+                  throw new Error(`Failed to fetch image from URL: ${response.statusText}`);
+                }
+                const contentType = response.headers.get("content-type") || "image/jpeg";
+                const arrayBuffer = await response.arrayBuffer();
+                const base64Data = Buffer.from(arrayBuffer).toString("base64");
+                parts.push({
+                  inlineData: {
+                    mimeType: contentType,
+                    data: base64Data,
+                  },
+                });
+              } catch (fetchErr) {
+                console.error("Error fetching image for Gemini:", fetchErr);
+                throw fetchErr;
+              }
+            }
+          }
+        }
+        return {
+          role,
+          parts,
+        };
+      })
+  );
 
   const body: any = {
     contents,
