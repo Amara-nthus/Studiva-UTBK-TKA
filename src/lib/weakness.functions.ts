@@ -34,7 +34,7 @@ export const analyzeWeakness = createServerFn({ method: "POST" })
       const payload: WeaknessPayload = {
         summary: `Luar biasa! Kamu menjawab ${data.correctCount}/${data.total} dengan benar. Pertahankan dan naikkan level ke soal yang lebih sulit.`,
         weak_topics: [],
-        suggested_drills: ["Coba simulasi lebih sulit", "Ajarkan materi ke teman untuk memperkuat ingatan"],
+        suggested_drills: ["Coba latihan soal lebih sulit", "Ajarkan materi ke teman untuk memperkuat ingatan"],
       };
       await supabase.from("weakness_reports").insert({ user_id: userId, kind: data.kind, payload: payload as unknown as never });
       return payload;

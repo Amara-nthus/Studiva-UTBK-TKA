@@ -3,18 +3,18 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { startSimulation, getSimulationQuestions, submitSimulation } from "@/lib/simulasi.functions";
+import { startSimulation, getSimulationQuestions, submitSimulation } from "@/lib/latihan-soal.functions";
 import { analyzeWeakness } from "@/lib/weakness.functions";
 import { toast } from "sonner";
 import { Trophy, Flame, Loader2, Sparkles } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/simulasi")({
-  component: SimulasiPage,
+export const Route = createFileRoute("/_authenticated/latihan-soal")({
+  component: LatihanSoalPage,
 });
 
 type SimType = "snbt" | "tka";
 
-function SimulasiPage() {
+function LatihanSoalPage() {
   const startFn = useServerFn(startSimulation);
   const getQ = useServerFn(getSimulationQuestions);
   const submitFn = useServerFn(submitSimulation);
@@ -71,7 +71,7 @@ function SimulasiPage() {
         const w = await weaknessFn({
           data: {
             kind: type,
-            label: type === "snbt" ? "Simulasi SNBT" : "Simulasi TKA",
+            label: type === "snbt" ? "Latihan Soal SNBT" : "Latihan Soal TKA",
             wrong: r.wrong,
             correctCount: r.correct,
             total: r.total,
@@ -92,17 +92,17 @@ function SimulasiPage() {
     return (
       <AppShell>
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-4xl font-extrabold mb-2">Simulasi</h1>
-          <p className="text-brand/60 mb-8">Pilih jenis simulasi. Soal di-generate AI sesuai blueprint resmi.</p>
+          <h1 className="text-4xl font-extrabold mb-2">Latihan Soal</h1>
+          <p className="text-brand/60 mb-8">Pilih jenis latihan soal. Soal di-generate AI sesuai blueprint resmi.</p>
           <div className="grid md:grid-cols-2 gap-6">
             <button onClick={() => pick("snbt")} className="text-left p-8 bg-brand text-brand-foreground rounded-3xl hover:scale-[1.02] transition">
               <Trophy className="size-10 text-diva mb-4" />
-              <h2 className="text-2xl font-extrabold mb-2">Simulasi SNBT</h2>
+              <h2 className="text-2xl font-extrabold mb-2">Latihan Soal SNBT</h2>
               <p className="text-white/70 text-sm">30 soal · 7 subtes · skor 0-800 · +50 EXP</p>
             </button>
             <button onClick={() => pick("tka")} className="text-left p-8 bg-diva text-diva-foreground rounded-3xl hover:scale-[1.02] transition">
               <Flame className="size-10 text-brand mb-4" />
-              <h2 className="text-2xl font-extrabold mb-2">Simulasi TKA</h2>
+              <h2 className="text-2xl font-extrabold mb-2">Latihan Soal TKA</h2>
               <p className="text-brand/80 text-sm">30 soal · 5 mata pelajaran · skor 0-800 · +50 EXP</p>
             </button>
           </div>
@@ -129,7 +129,7 @@ function SimulasiPage() {
       <AppShell>
         <div className="max-w-3xl mx-auto space-y-6">
           <div className="bg-card border border-brand/5 rounded-3xl p-10 text-center shadow-xl">
-            <div className="text-xs font-bold uppercase text-accent">Hasil Simulasi {type.toUpperCase()}</div>
+            <div className="text-xs font-bold uppercase text-accent">Hasil Latihan Soal {type.toUpperCase()}</div>
             <div className="text-7xl font-black my-6 text-brand">{result.score}</div>
             <p className="text-brand/60 mb-6">Benar {result.correct} dari {result.total} soal ({pct}%)</p>
             <div className="grid sm:grid-cols-2 gap-2 mb-6 text-left">
@@ -193,7 +193,7 @@ function SimulasiPage() {
     <AppShell>
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
-          <h1 className="text-2xl font-extrabold">Simulasi {type.toUpperCase()}</h1>
+          <h1 className="text-2xl font-extrabold">Latihan Soal {type.toUpperCase()}</h1>
           <span className="text-sm font-bold text-brand/50">{answered}/{questions.length} terjawab</span>
         </div>
 

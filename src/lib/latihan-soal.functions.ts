@@ -68,7 +68,7 @@ export const startSimulation = createServerFn({ method: "POST" })
       .insert({ user_id: userId, type: data.type, score: 0 })
       .select("id")
       .single();
-    if (error || !sim) throw new Error(error?.message ?? "Gagal membuat simulasi");
+    if (error || !sim) throw new Error(error?.message ?? "Gagal membuat latihan soal");
  
     const sections = data.type === "snbt" ? SNBT_SECTIONS : TKA_SECTIONS;
     const sectionResults = await Promise.all(

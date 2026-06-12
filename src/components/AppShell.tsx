@@ -5,7 +5,7 @@ import { type ReactNode } from "react";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/simulasi", label: "Simulasi", icon: Sparkles },
+  { to: "/latihan-soal", label: "Latihan Soal", icon: Sparkles },
   { to: "/forum", label: "Forum", icon: Users },
   { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { to: "/catatan", label: "Catatan AI", icon: NotebookText },

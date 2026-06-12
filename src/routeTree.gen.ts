@@ -13,9 +13,9 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTimerRouteImport } from './routes/_authenticated/timer'
-import { Route as AuthenticatedSimulasiRouteImport } from './routes/_authenticated/simulasi'
 import { Route as AuthenticatedPsikotesRouteImport } from './routes/_authenticated/psikotes'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
+import { Route as AuthenticatedLatihanSoalRouteImport } from './routes/_authenticated/latihan-soal'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedChatbotRouteImport } from './routes/_authenticated/chatbot'
 import { Route as AuthenticatedForumIndexRouteImport } from './routes/_authenticated/forum.index'
@@ -42,11 +42,6 @@ const AuthenticatedTimerRoute = AuthenticatedTimerRouteImport.update({
   path: '/timer',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedSimulasiRoute = AuthenticatedSimulasiRouteImport.update({
-  id: '/simulasi',
-  path: '/simulasi',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedPsikotesRoute = AuthenticatedPsikotesRouteImport.update({
   id: '/psikotes',
   path: '/psikotes',
@@ -56,6 +51,12 @@ const AuthenticatedLeaderboardRoute =
   AuthenticatedLeaderboardRouteImport.update({
     id: '/leaderboard',
     path: '/leaderboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedLatihanSoalRoute =
+  AuthenticatedLatihanSoalRouteImport.update({
+    id: '/latihan-soal',
+    path: '/latihan-soal',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -95,9 +96,9 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/chatbot': typeof AuthenticatedChatbotRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/latihan-soal': typeof AuthenticatedLatihanSoalRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/psikotes': typeof AuthenticatedPsikotesRoute
-  '/simulasi': typeof AuthenticatedSimulasiRoute
   '/timer': typeof AuthenticatedTimerRoute
   '/catatan/$id': typeof AuthenticatedCatatanIdRoute
   '/forum/$id': typeof AuthenticatedForumIdRoute
@@ -109,9 +110,9 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/chatbot': typeof AuthenticatedChatbotRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/latihan-soal': typeof AuthenticatedLatihanSoalRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/psikotes': typeof AuthenticatedPsikotesRoute
-  '/simulasi': typeof AuthenticatedSimulasiRoute
   '/timer': typeof AuthenticatedTimerRoute
   '/catatan/$id': typeof AuthenticatedCatatanIdRoute
   '/forum/$id': typeof AuthenticatedForumIdRoute
@@ -125,9 +126,9 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/chatbot': typeof AuthenticatedChatbotRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/latihan-soal': typeof AuthenticatedLatihanSoalRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/psikotes': typeof AuthenticatedPsikotesRoute
-  '/_authenticated/simulasi': typeof AuthenticatedSimulasiRoute
   '/_authenticated/timer': typeof AuthenticatedTimerRoute
   '/_authenticated/catatan/$id': typeof AuthenticatedCatatanIdRoute
   '/_authenticated/forum/$id': typeof AuthenticatedForumIdRoute
@@ -141,9 +142,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/chatbot'
     | '/dashboard'
+    | '/latihan-soal'
     | '/leaderboard'
     | '/psikotes'
-    | '/simulasi'
     | '/timer'
     | '/catatan/$id'
     | '/forum/$id'
@@ -155,9 +156,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/chatbot'
     | '/dashboard'
+    | '/latihan-soal'
     | '/leaderboard'
     | '/psikotes'
-    | '/simulasi'
     | '/timer'
     | '/catatan/$id'
     | '/forum/$id'
@@ -170,9 +171,9 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/chatbot'
     | '/_authenticated/dashboard'
+    | '/_authenticated/latihan-soal'
     | '/_authenticated/leaderboard'
     | '/_authenticated/psikotes'
-    | '/_authenticated/simulasi'
     | '/_authenticated/timer'
     | '/_authenticated/catatan/$id'
     | '/_authenticated/forum/$id'
@@ -216,13 +217,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTimerRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/simulasi': {
-      id: '/_authenticated/simulasi'
-      path: '/simulasi'
-      fullPath: '/simulasi'
-      preLoaderRoute: typeof AuthenticatedSimulasiRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/psikotes': {
       id: '/_authenticated/psikotes'
       path: '/psikotes'
@@ -235,6 +229,13 @@ declare module '@tanstack/react-router' {
       path: '/leaderboard'
       fullPath: '/leaderboard'
       preLoaderRoute: typeof AuthenticatedLeaderboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/latihan-soal': {
+      id: '/_authenticated/latihan-soal'
+      path: '/latihan-soal'
+      fullPath: '/latihan-soal'
+      preLoaderRoute: typeof AuthenticatedLatihanSoalRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
@@ -285,9 +286,9 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedChatbotRoute: typeof AuthenticatedChatbotRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedLatihanSoalRoute: typeof AuthenticatedLatihanSoalRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedPsikotesRoute: typeof AuthenticatedPsikotesRoute
-  AuthenticatedSimulasiRoute: typeof AuthenticatedSimulasiRoute
   AuthenticatedTimerRoute: typeof AuthenticatedTimerRoute
   AuthenticatedCatatanIdRoute: typeof AuthenticatedCatatanIdRoute
   AuthenticatedForumIdRoute: typeof AuthenticatedForumIdRoute
@@ -298,9 +299,9 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedChatbotRoute: AuthenticatedChatbotRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedLatihanSoalRoute: AuthenticatedLatihanSoalRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedPsikotesRoute: AuthenticatedPsikotesRoute,
-  AuthenticatedSimulasiRoute: AuthenticatedSimulasiRoute,
   AuthenticatedTimerRoute: AuthenticatedTimerRoute,
   AuthenticatedCatatanIdRoute: AuthenticatedCatatanIdRoute,
   AuthenticatedForumIdRoute: AuthenticatedForumIdRoute,

@@ -9,13 +9,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Platform persiapan UTBK-SNBT & TKA untuk pelajar SMA. Simulasi skor, streak harian, catatan AI, dan rekomendasi jurusan berbasis data.",
+          "Platform persiapan UTBK-SNBT & TKA untuk pelajar SMA. Latihan soal & skor, streak harian, catatan AI, dan rekomendasi jurusan berbasis data.",
       },
       { property: "og:title", content: "Studiva — Tembus Kampus Impianmu" },
       {
         property: "og:description",
         content:
-          "Simulasi SNBT & TKA, kuis harian, catatan AI, dan psikotes jurusan untuk pelajar SMA Indonesia.",
+          "Latihan soal SNBT & TKA, kuis harian, catatan AI, dan psikotes jurusan untuk pelajar SMA Indonesia.",
       },
     ],
   }),
@@ -61,7 +61,7 @@ function Landing() {
             <span className="text-accent italic">percaya diri.</span>
           </h1>
           <p className="text-lg text-brand/60 mb-10 max-w-lg">
-            Simulasi SNBT & TKA, kuis harian dengan streak, catatan AI yang otomatis jadi flashcard,
+            Latihan soal SNBT & TKA, kuis harian dengan streak, catatan AI yang otomatis jadi flashcard,
             plus rekomendasi jurusan dari psikotes. Semua dalam satu app.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
@@ -131,7 +131,7 @@ function Landing() {
             <div>
               <h2 className="text-4xl font-extrabold mb-4">Diva Recommendation Engine</h2>
               <p className="text-white/60 max-w-xl">
-                Setelah simulasi, kami berikan cetak biru kesuksesan akademikmu — kampus favorit
+                Setelah latihan soal, kami berikan cetak biru kesuksesan akademikmu — kampus favorit
                 plus dua alternatif terbaik (jurusan sama beda kampus, kampus sama beda jurusan).
               </p>
             </div>
