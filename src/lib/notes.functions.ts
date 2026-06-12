@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 // Global list with optional search query (any authenticated user sees all notes)
 export const listNotes = createServerFn({ method: "POST" })
@@ -12,8 +13,8 @@ export const listNotes = createServerFn({ method: "POST" })
     }).parse(input ?? {}),
   )
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    let q = supabase
+    const { userId } = context;
+    let q = supabaseAdmin
       .from("notes")
       .select("id, user_id, title, status, summary, created_at")
       .order("created_at", { ascending: false })
@@ -25,7 +26,7 @@ export const listNotes = createServerFn({ method: "POST" })
     }
     const { data: notes } = await q;
     const ids = Array.from(new Set((notes ?? []).map((n) => n.user_id)));
-    const { data: profiles } = await supabase
+    const { data: profiles } = await supabaseAdmin
       .from("profiles")
       .select("id, display_name, avatar_url, school")
       .in("id", ids.length ? ids : ["00000000-0000-0000-0000-000000000000"]);
@@ -39,17 +40,17 @@ export const getNote = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+    const { userId } = context;
     const [{ data: note }, { data: cards }, { data: quiz }] = await Promise.all([
-      supabase.from("notes").select("*").eq("id", data.id).single(),
-      supabase.from("flashcards").select("*").eq("note_id", data.id).order("position"),
-      supabase.from("note_quiz").select("*").eq("note_id", data.id).order("position"),
+      supabaseAdmin.from("notes").select("*").eq("id", data.id).single(),
+      supabaseAdmin.from("flashcards").select("*").eq("note_id", data.id).order("position"),
+      supabaseAdmin.from("note_quiz").select("*").eq("note_id", data.id).order("position"),
     ]);
     const { data: owner } = note
-      ? await supabase.from("profiles").select("id, display_name, avatar_url, school").eq("id", note.user_id).single()
+      ? await supabaseAdmin.from("profiles").select("id, display_name, avatar_url, school").eq("id", note.user_id).single()
       : { data: null };
     const { data: signed } = note?.image_path
-      ? await supabase.storage.from("notes").createSignedUrl(note.image_path, 3600)
+      ? await supabaseAdmin.storage.from("notes").createSignedUrl(note.image_path, 3600)
       : { data: null };
     return {
       note,
@@ -65,13 +66,13 @@ export const deleteNote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const { data: note } = await supabase.from("notes").select("image_path, user_id").eq("id", data.id).single();
+    const { userId } = context;
+    const { data: note } = await supabaseAdmin.from("notes").select("image_path, user_id").eq("id", data.id).single();
     if (!note || note.user_id !== userId) throw new Error("Tidak diizinkan");
-    await supabase.from("flashcards").delete().eq("note_id", data.id);
-    await supabase.from("note_quiz").delete().eq("note_id", data.id);
-    if (note.image_path) await supabase.storage.from("notes").remove([note.image_path]);
-    await supabase.from("notes").delete().eq("id", data.id);
+    await supabaseAdmin.from("flashcards").delete().eq("note_id", data.id);
+    await supabaseAdmin.from("note_quiz").delete().eq("note_id", data.id);
+    if (note.image_path) await supabaseAdmin.storage.from("notes").remove([note.image_path]);
+    await supabaseAdmin.from("notes").delete().eq("id", data.id);
     return { ok: true };
   });
 
@@ -85,7 +86,7 @@ export const analyzeNote = createServerFn({ method: "POST" })
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+    const { userId } = context;
     const { callLovableAI, extractJSON } = await import("./ai-gateway.server");
 
     const mime = data.mimeType ?? "";
@@ -94,7 +95,7 @@ export const analyzeNote = createServerFn({ method: "POST" })
     const isText = mime.startsWith("text/") || /\.(txt|md|markdown|csv)$/i.test(data.imagePath);
     const isDoc = /\.(docx?|odt|rtf)$/i.test(data.imagePath) || mime.includes("word");
 
-    const { data: created, error } = await supabase
+    const { data: created, error } = await supabaseAdmin
       .from("notes")
       .insert({ user_id: userId, title: data.title, image_path: data.imagePath, status: "processing", mime_type: mime || null })
       .select("id")
@@ -103,7 +104,7 @@ export const analyzeNote = createServerFn({ method: "POST" })
     const noteId = created.id;
 
     if (isDoc) {
-      await supabase.from("notes").update({ status: "failed", summary: "Format DOC/DOCX belum didukung. Mohon konversi ke PDF atau teks." }).eq("id", noteId);
+      await supabaseAdmin.from("notes").update({ status: "failed", summary: "Format DOC/DOCX belum didukung. Mohon konversi ke PDF atau teks." }).eq("id", noteId);
       throw new Error("Format DOC/DOCX belum didukung. Mohon upload PDF atau teks.");
     }
 
@@ -120,7 +121,7 @@ Buat tepat 6 flashcards dan 5 soal pilihan ganda. Jangan tambahkan teks lain di 
       let messageContent: import("./ai-gateway.server").ChatMessage["content"];
 
       if (isImage || isPdf) {
-        const { data: signed, error: sErr } = await supabase.storage
+        const { data: signed, error: sErr } = await supabaseAdmin.storage
           .from("notes")
           .createSignedUrl(data.imagePath, 600);
         if (sErr || !signed) throw new Error("Gagal membuat signed URL");
@@ -129,7 +130,7 @@ Buat tepat 6 flashcards dan 5 soal pilihan ganda. Jangan tambahkan teks lain di 
           { type: "image_url", image_url: { url: signed.signedUrl } },
         ];
       } else if (isText) {
-        const { data: blob, error: dErr } = await supabase.storage.from("notes").download(data.imagePath);
+        const { data: blob, error: dErr } = await supabaseAdmin.storage.from("notes").download(data.imagePath);
         if (dErr || !blob) throw new Error("Gagal membaca berkas teks");
         const text = await blob.text();
         messageContent = `${promptBase}\n\nIsi catatan:\n${text.slice(0, 12000)}`;
@@ -150,7 +151,7 @@ Buat tepat 6 flashcards dan 5 soal pilihan ganda. Jangan tambahkan teks lain di 
       }>(content);
 
       if (parsed.flashcards?.length) {
-        await supabase.from("flashcards").insert(
+        await supabaseAdmin.from("flashcards").insert(
           parsed.flashcards.slice(0, 8).map((c, i) => ({
             note_id: noteId,
             user_id: userId,
@@ -161,7 +162,7 @@ Buat tepat 6 flashcards dan 5 soal pilihan ganda. Jangan tambahkan teks lain di 
         );
       }
       if (parsed.quiz?.length) {
-        await supabase.from("note_quiz").insert(
+        await supabaseAdmin.from("note_quiz").insert(
           parsed.quiz.slice(0, 6).map((q, i) => ({
             note_id: noteId,
             user_id: userId,
@@ -174,14 +175,14 @@ Buat tepat 6 flashcards dan 5 soal pilihan ganda. Jangan tambahkan teks lain di 
         );
       }
 
-      await supabase
+      await supabaseAdmin
         .from("notes")
         .update({ status: "ready", summary: parsed.summary ?? null })
         .eq("id", noteId);
 
       return { noteId, ok: true };
     } catch (e) {
-      await supabase.from("notes").update({ status: "failed" }).eq("id", noteId);
+      await supabaseAdmin.from("notes").update({ status: "failed" }).eq("id", noteId);
       throw e instanceof Error ? e : new Error("Analisis gagal");
     }
   });
@@ -195,21 +196,21 @@ export const submitNoteQuiz = createServerFn({ method: "POST" })
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+    const { userId } = context;
     // Quiz rows are readable by any authenticated user now (we no longer scope by user_id)
-    const { data: quiz } = await supabase
+    const { data: quiz } = await supabaseAdmin
       .from("note_quiz")
       .select("id, answer_index")
       .eq("note_id", data.noteId);
     const map = new Map((quiz ?? []).map((q) => [q.id, q.answer_index]));
     let correct = 0;
     for (const a of data.answers) if (map.get(a.quizId) === a.chosen) correct++;
-    const { data: stats } = await supabase
+    const { data: stats } = await supabaseAdmin
       .from("user_stats")
       .select("exp")
       .eq("user_id", userId)
       .single();
-    await supabase
+    await supabaseAdmin
       .from("user_stats")
       .update({
         exp: (stats?.exp ?? 0) + correct * 5,
