@@ -1,1 +1,0 @@
-import{c as e,r as a}from"./auth-middleware-Bs3evh_k.js";import{c as r}from"./index-DbAPANjp.js";const t=e({method:"POST"}).middleware([a]).handler(r("14be741f39278dac42d2ae5e542be2065d6964298f3c1d7056caa6e5dacf0d6e"));export{t as a};
